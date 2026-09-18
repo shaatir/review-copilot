@@ -88,11 +88,10 @@ export function registrableParts(domain: string): {
 
 export function findAllowlistMatch(domain: string) {
   const { host, registrable } = registrableParts(domain);
-  return allowlist.find(
-    (entry) =>
-      entry.domain === host ||
-      entry.domain === registrable ||
-      host.endsWith(`.${entry.domain}`),
+  return (
+    allowlist.find((entry) => entry.domain === host) ??
+    allowlist.find((entry) => host.endsWith(`.${entry.domain}`)) ??
+    allowlist.find((entry) => entry.domain === registrable)
   );
 }
 

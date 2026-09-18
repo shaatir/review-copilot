@@ -116,6 +116,8 @@ export function QueueView({ items, campaigns }: QueueViewProps) {
         <label className="relative flex-1">
           <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-faint" />
           <input
+            id="queue-search"
+            name="queue-search"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder="Search domain, wallet, kit, DET-id…"
@@ -125,6 +127,8 @@ export function QueueView({ items, campaigns }: QueueViewProps) {
         <div className="flex flex-wrap items-center gap-2 text-[12px]">
           <Filter className="h-3.5 w-3.5 text-faint" />
           <select
+            id="queue-brand"
+            name="brand"
             value={brand}
             onChange={(event) => setBrand(event.target.value)}
             className="rounded-lg border border-line bg-bg px-2 py-2"
@@ -135,6 +139,8 @@ export function QueueView({ items, campaigns }: QueueViewProps) {
             ))}
           </select>
           <select
+            id="queue-decision"
+            name="decision"
             value={decision}
             onChange={(event) =>
               setDecision(event.target.value as Decision | "ALL")
@@ -148,6 +154,8 @@ export function QueueView({ items, campaigns }: QueueViewProps) {
             ))}
           </select>
           <select
+            id="queue-campaign"
+            name="campaign"
             value={campaign}
             onChange={(event) => setCampaign(event.target.value)}
             className="rounded-lg border border-line bg-bg px-2 py-2"
@@ -159,6 +167,20 @@ export function QueueView({ items, campaigns }: QueueViewProps) {
               </option>
             ))}
           </select>
+          {query || brand !== "ALL" || decision !== "ALL" || campaign !== "ALL" ? (
+            <button
+              type="button"
+              onClick={() => {
+                setQuery("");
+                setBrand("ALL");
+                setDecision("ALL");
+                setCampaign("ALL");
+              }}
+              className="rounded-lg border border-line px-2 py-2 text-muted hover:text-ink"
+            >
+              Clear
+            </button>
+          ) : null}
         </div>
       </div>
 

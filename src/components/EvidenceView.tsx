@@ -319,6 +319,8 @@ export function EvidenceView({
             ))}
           </div>
           <textarea
+            id="analyst-note"
+            name="analyst-note"
             value={note}
             onChange={(event) => setNote(event.target.value)}
             placeholder="Optional analyst note"
