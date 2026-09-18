@@ -1,0 +1,65 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #070b14;
+  --bg-elevated: #0e1524;
+  --bg-hover: #141d30;
+  --line: #1c2740;
+  --line-strong: #2c3c61;
+  --text: #e8eef8;
+  --muted: #8b96ab;
+  --faint: #5c6780;
+  --accent: #3ddc97;
+  --accent-dim: #163528;
+  --approve: #f07178;
+  --approve-dim: #3a1c22;
+  --watch: #f5c26b;
+  --watch-dim: #3a2f16;
+  --reject: #7aa2f7;
+  --reject-dim: #1a2746;
+  --official: #5eead4;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-elevated: var(--bg-elevated);
+  --color-hover: var(--bg-hover);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-ink: var(--text);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-accent: var(--accent);
+  --color-accent-dim: var(--accent-dim);
+  --color-approve: var(--approve);
+  --color-approve-dim: var(--approve-dim);
+  --color-watch: var(--watch);
+  --color-watch-dim: var(--watch-dim);
+  --color-reject: var(--reject);
+  --color-reject-dim: var(--reject-dim);
+  --color-official: var(--official);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+html,
+body {
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100%;
+}
+
+body {
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  background-image:
+    radial-gradient(1200px 500px at 10% -10%, rgba(61, 220, 151, 0.07), transparent 50%),
+    radial-gradient(900px 400px at 100% 0%, rgba(122, 162, 247, 0.06), transparent 45%);
+}
+
+* {
+  scrollbar-color: #2c3c61 transparent;
+}
+
+::selection {
+  background: rgba(61, 220, 151, 0.28);
+}
