@@ -1,36 +1,49 @@
 @import "tailwindcss";
 
 :root {
-  --bg: #070b14;
-  --bg-elevated: #0e1524;
-  --bg-hover: #141d30;
-  --line: #1c2740;
-  --line-strong: #2c3c61;
-  --text: #e8eef8;
-  --muted: #8b96ab;
-  --faint: #5c6780;
-  --accent: #3ddc97;
-  --accent-dim: #163528;
-  --approve: #f07178;
-  --approve-dim: #3a1c22;
-  --watch: #f5c26b;
-  --watch-dim: #3a2f16;
-  --reject: #7aa2f7;
-  --reject-dim: #1a2746;
-  --official: #5eead4;
+  --header: #232f3e;
+  --header-hover: #31465f;
+  --orange: #ec7211;
+  --orange-hover: #eb5f07;
+  --blue: #0073bb;
+  --blue-hover: #0a4a74;
+  --bg: #eaeded;
+  --panel: #ffffff;
+  --line: #d5dbdb;
+  --line-strong: #aab7b8;
+  --text: #16191f;
+  --muted: #545b64;
+  --faint: #687078;
+  --hover: #f2f8fd;
+  --row-alt: #fafafa;
+  --nav: #f2f8fd;
+  --approve: #d13212;
+  --approve-dim: #fdf3f1;
+  --watch: #8d6605;
+  --watch-dim: #faf3dd;
+  --reject: #0073bb;
+  --reject-dim: #f1faff;
+  --official: #1d8102;
+  --success-dim: #f2f8f2;
 }
 
 @theme inline {
+  --color-header: var(--header);
+  --color-header-hover: var(--header-hover);
+  --color-orange: var(--orange);
+  --color-orange-hover: var(--orange-hover);
+  --color-blue: var(--blue);
+  --color-blue-hover: var(--blue-hover);
   --color-bg: var(--bg);
-  --color-elevated: var(--bg-elevated);
-  --color-hover: var(--bg-hover);
+  --color-panel: var(--panel);
   --color-line: var(--line);
   --color-line-strong: var(--line-strong);
   --color-ink: var(--text);
   --color-muted: var(--muted);
   --color-faint: var(--faint);
-  --color-accent: var(--accent);
-  --color-accent-dim: var(--accent-dim);
+  --color-hover: var(--hover);
+  --color-row-alt: var(--row-alt);
+  --color-nav: var(--nav);
   --color-approve: var(--approve);
   --color-approve-dim: var(--approve-dim);
   --color-watch: var(--watch);
@@ -38,8 +51,13 @@
   --color-reject: var(--reject);
   --color-reject-dim: var(--reject-dim);
   --color-official: var(--official);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-success-dim: var(--success-dim);
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial,
+    sans-serif;
+  --font-mono:
+    "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New",
+    monospace;
 }
 
 html,
@@ -50,16 +68,74 @@ body {
 }
 
 body {
-  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
-  background-image:
-    radial-gradient(1200px 500px at 10% -10%, rgba(61, 220, 151, 0.07), transparent 50%),
-    radial-gradient(900px 400px at 100% 0%, rgba(122, 162, 247, 0.06), transparent 45%);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.4;
 }
 
 * {
-  scrollbar-color: #2c3c61 transparent;
+  scrollbar-color: #aab7b8 transparent;
 }
 
 ::selection {
-  background: rgba(61, 220, 151, 0.28);
+  background: rgba(0, 115, 187, 0.18);
+}
+
+.console-control {
+  border: 1px solid var(--line-strong);
+  background: var(--panel);
+  color: var(--text);
+  border-radius: 2px;
+  font-size: 13px;
+  line-height: 1.3;
+}
+
+.console-control::placeholder {
+  color: var(--faint);
+}
+
+.console-control:focus {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 1px var(--blue);
+  outline: none;
+}
+
+.console-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  text-align: left;
+}
+
+.console-table thead th {
+  background: var(--row-alt);
+  border-bottom: 1px solid var(--line);
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  padding: 8px 12px;
+  white-space: nowrap;
+}
+
+.console-table tbody td {
+  border-bottom: 1px solid var(--line);
+  padding: 8px 12px;
+  vertical-align: middle;
+}
+
+.console-table tbody tr:nth-child(even) {
+  background: var(--row-alt);
+}
+
+.console-table tbody tr:hover {
+  background: var(--hover);
+}
+
+.micro-label {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }

@@ -1,16 +1,18 @@
 "use client";
 
 import { DecisionBadge } from "@/components/DecisionBadge";
-import { formatWhen, pct, shortWallet } from "@/lib/format";
+import { Container, PageHeader, StatTile } from "@/components/console";
+import { formatWhen, pct } from "@/lib/format";
 import { loadReviews } from "@/lib/reviews";
 import type { Campaign, Decision, HumanReview, TriagedDetection } from "@/lib/types";
-import { Filter, Layers3, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
 type QueueViewProps = {
   items: TriagedDetection[];
   campaigns: Campaign[];
+  initialCampaign?: string;
 };
 
 const DECISIONS: Array<Decision | "ALL"> = [
@@ -20,11 +22,13 @@ const DECISIONS: Array<Decision | "ALL"> = [
   "REJECT",
 ];
 
-export function QueueView({ items, campaigns }: QueueViewProps) {
+export function QueueView({ items, campaigns, initialCampaign }: QueueViewProps) {
   const [query, setQuery] = useState("");
   const [brand, setBrand] = useState("ALL");
   const [decision, setDecision] = useState<Decision | "ALL">("ALL");
-  const [campaign, setCampaign] = useState("ALL");
+  const [campaign, setCampaign] = useState(() =>
+    campaigns.some((item) => item.id === initialCampaign) ? initialCampaign! : "ALL",
+  );
   const [reviews] = useState<Record<string, HumanReview>>(() => loadReviews());
 
   const brands = useMemo(
@@ -61,221 +65,228 @@ export function QueueView({ items, campaigns }: QueueViewProps) {
     clusters: campaigns.length,
   };
 
+  const filtersActive =
+    query || brand !== "ALL" || decision !== "ALL" || campaign !== "ALL";
+
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="text-xl font-semibold tracking-tight">Analyst queue</h1>
-          <p className="mt-1 max-w-2xl text-sm text-muted">
-            Draft decisions only. Review Copilot never writes a blocklist —
-            it packages evidence so an analyst can.
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-2 text-[12px]">
-          <Stat label="Open" value={stats.total} />
-          <Stat label="Approve" value={stats.approve} tone="approve" />
-          <Stat label="Watch" value={stats.watch} tone="watch" />
-          <Stat label="Reject" value={stats.reject} tone="reject" />
-          <Stat label="Campaigns" value={stats.clusters} />
-        </div>
+      <PageHeader
+        title="Detection queue"
+        description="Draft decisions only. Review Copilot never writes a blocklist — it packages evidence so an analyst can."
+      />
+
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
+        <StatTile label="Open" value={stats.total} />
+        <StatTile label="Approve" value={stats.approve} tone="approve" />
+        <StatTile label="Watchlist" value={stats.watch} tone="watch" />
+        <StatTile label="Reject" value={stats.reject} tone="reject" />
+        <StatTile label="Campaigns" value={stats.clusters} />
       </div>
 
-      <div className="grid gap-3 lg:grid-cols-3">
-        {campaigns.map((item) => (
-          <button
-            key={item.id}
-            type="button"
-            onClick={() =>
-              setCampaign((current) => (current === item.id ? "ALL" : item.id))
-            }
-            className={`rounded-xl border p-3 text-left transition ${
-              campaign === item.id
-                ? "border-accent/40 bg-accent-dim"
-                : "border-line bg-elevated hover:border-line-strong"
-            }`}
-          >
-            <div className="flex items-center gap-2 text-[11px] uppercase tracking-wider text-muted">
-              <Layers3 className="h-3.5 w-3.5 text-accent" />
-              Campaign cluster
+      <Container
+        header="Detections"
+        headerExtra={`${filtered.length} of ${items.length} shown`}
+        noPad
+      >
+        <div className="flex flex-col gap-3 border-b border-line bg-row-alt px-3 py-3">
+          <div className="flex flex-col gap-2 lg:flex-row lg:items-center">
+            <label className="relative min-w-0 flex-1">
+              <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-faint" />
+              <input
+                id="queue-search"
+                name="queue-search"
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="Search domain, wallet, kit, DET-id"
+                className="console-control w-full py-1.5 pl-8 pr-3"
+              />
+            </label>
+            <div className="flex flex-wrap items-center gap-2">
+              <select
+                id="queue-brand"
+                name="brand"
+                aria-label="Filter by brand"
+                value={brand}
+                onChange={(event) => setBrand(event.target.value)}
+                className="console-control px-2 py-1.5"
+              >
+                <option value="ALL">All brands</option>
+                {brands.map((name) => (
+                  <option key={name}>{name}</option>
+                ))}
+              </select>
+              <select
+                id="queue-decision"
+                name="decision"
+                aria-label="Filter by draft decision"
+                value={decision}
+                onChange={(event) =>
+                  setDecision(event.target.value as Decision | "ALL")
+                }
+                className="console-control px-2 py-1.5"
+              >
+                {DECISIONS.map((value) => (
+                  <option key={value} value={value}>
+                    {value === "ALL" ? "All drafts" : value}
+                  </option>
+                ))}
+              </select>
+              <select
+                id="queue-campaign"
+                name="campaign"
+                aria-label="Filter by campaign"
+                value={campaign}
+                onChange={(event) => setCampaign(event.target.value)}
+                className="console-control px-2 py-1.5"
+              >
+                <option value="ALL">All campaigns</option>
+                {campaigns.map((item) => (
+                  <option key={item.id} value={item.id}>
+                    {item.name}
+                  </option>
+                ))}
+              </select>
+              {filtersActive ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setQuery("");
+                    setBrand("ALL");
+                    setDecision("ALL");
+                    setCampaign("ALL");
+                  }}
+                  className="text-[13px] text-blue hover:text-blue-hover hover:underline"
+                >
+                  Clear filters
+                </button>
+              ) : null}
             </div>
-            <div className="mt-1 text-sm font-medium">{item.name}</div>
-            <p className="mt-1 text-[12px] leading-relaxed text-muted">
-              {item.summary}
-            </p>
-            <div className="mt-2 font-mono text-[11px] text-faint">
-              {item.detectionIds.length} assets
-              {item.sharedWallets[0]
-                ? ` · ${shortWallet(item.sharedWallets[0])}`
-                : ""}
-            </div>
-          </button>
-        ))}
-      </div>
+          </div>
 
-      <div className="flex flex-col gap-3 rounded-xl border border-line bg-elevated p-3 sm:flex-row sm:items-center">
-        <label className="relative flex-1">
-          <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-faint" />
-          <input
-            id="queue-search"
-            name="queue-search"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search domain, wallet, kit, DET-id…"
-            className="w-full rounded-lg border border-line bg-bg py-2 pl-8 pr-3 text-sm outline-none placeholder:text-faint focus:border-line-strong"
-          />
-        </label>
-        <div className="flex flex-wrap items-center gap-2 text-[12px]">
-          <Filter className="h-3.5 w-3.5 text-faint" />
-          <select
-            id="queue-brand"
-            name="brand"
-            value={brand}
-            onChange={(event) => setBrand(event.target.value)}
-            className="rounded-lg border border-line bg-bg px-2 py-2"
-          >
-            <option value="ALL">All brands</option>
-            {brands.map((name) => (
-              <option key={name}>{name}</option>
-            ))}
-          </select>
-          <select
-            id="queue-decision"
-            name="decision"
-            value={decision}
-            onChange={(event) =>
-              setDecision(event.target.value as Decision | "ALL")
-            }
-            className="rounded-lg border border-line bg-bg px-2 py-2"
-          >
-            {DECISIONS.map((value) => (
-              <option key={value} value={value}>
-                {value === "ALL" ? "All drafts" : value}
-              </option>
-            ))}
-          </select>
-          <select
-            id="queue-campaign"
-            name="campaign"
-            value={campaign}
-            onChange={(event) => setCampaign(event.target.value)}
-            className="rounded-lg border border-line bg-bg px-2 py-2"
-          >
-            <option value="ALL">All campaigns</option>
-            {campaigns.map((item) => (
-              <option key={item.id} value={item.id}>
-                {item.name}
-              </option>
-            ))}
-          </select>
-          {query || brand !== "ALL" || decision !== "ALL" || campaign !== "ALL" ? (
-            <button
-              type="button"
-              onClick={() => {
-                setQuery("");
-                setBrand("ALL");
-                setDecision("ALL");
-                setCampaign("ALL");
-              }}
-              className="rounded-lg border border-line px-2 py-2 text-muted hover:text-ink"
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className="micro-label mr-1">Clusters</span>
+            <FilterChip
+              active={campaign === "ALL"}
+              onClick={() => setCampaign("ALL")}
             >
-              Clear
-            </button>
-          ) : null}
+              All
+            </FilterChip>
+            {campaigns.map((item) => (
+              <FilterChip
+                key={item.id}
+                active={campaign === item.id}
+                onClick={() =>
+                  setCampaign((current) => (current === item.id ? "ALL" : item.id))
+                }
+                title={item.summary}
+              >
+                {item.name}
+                <span className="ml-1 text-faint">{item.detectionIds.length}</span>
+              </FilterChip>
+            ))}
+          </div>
         </div>
-      </div>
 
-      <div className="overflow-x-auto rounded-xl border border-line">
-        <table className="w-full min-w-[860px] text-left text-[13px]">
-          <thead className="bg-[#0a1220] text-[11px] uppercase tracking-wider text-faint">
-            <tr>
-              <th className="px-3 py-2.5 font-medium">ID</th>
-              <th className="px-3 py-2.5 font-medium">Brand</th>
-              <th className="px-3 py-2.5 font-medium">Suspicious host</th>
-              <th className="px-3 py-2.5 font-medium">Signals</th>
-              <th className="px-3 py-2.5 font-medium">Draft</th>
-              <th className="px-3 py-2.5 font-medium">Conf.</th>
-              <th className="px-3 py-2.5 font-medium">Seen</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.map((item) => {
-              const human = reviews[item.id];
-              return (
-                <tr key={item.id} className="border-t border-line bg-elevated hover:bg-hover">
-                  <td className="px-3 py-2.5 font-mono text-[12px]">
-                    <Link href={`/detections/${item.id}`} className="text-ink hover:text-accent">
-                      {item.id}
-                    </Link>
-                  </td>
-                  <td className="px-3 py-2.5 text-muted">{item.brand.name}</td>
-                  <td className="px-3 py-2.5">
-                    <Link href={`/detections/${item.id}`} className="block">
-                      <span className="font-medium">{item.suspicious.domain}</span>
-                      {item.campaignId ? (
-                        <span className="ml-2 rounded-full bg-accent-dim px-1.5 py-0.5 text-[10px] text-accent">
-                          cluster
+        <div className="overflow-x-auto">
+          <table className="console-table min-w-[920px]">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Brand</th>
+                <th>Suspicious host</th>
+                <th>Signals</th>
+                <th>Draft</th>
+                <th>Conf.</th>
+                <th>Seen</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map((item) => {
+                const human = reviews[item.id];
+                return (
+                  <tr key={item.id}>
+                    <td className="font-mono text-[12px]">
+                      <Link
+                        href={`/detections/${item.id}`}
+                        className="text-blue hover:text-blue-hover hover:underline"
+                      >
+                        {item.id}
+                      </Link>
+                    </td>
+                    <td className="text-muted">{item.brand.name}</td>
+                    <td>
+                      <Link href={`/detections/${item.id}`} className="block">
+                        <span className="font-medium text-ink">
+                          {item.suspicious.domain}
                         </span>
-                      ) : null}
-                      {human ? (
-                        <span className="ml-2 text-[10px] text-muted">
-                          human: {human.decision}
-                        </span>
-                      ) : null}
-                    </Link>
-                  </td>
-                  <td className="px-3 py-2.5 text-[12px] text-muted">
-                    lookalike {pct(item.draft.signals.lookalikeScore)}
-                    {item.draft.signals.sharedDrain ? " · drain" : ""}
-                    {item.draft.signals.htmlKitFingerprint ? " · kit" : ""}
-                    {item.draft.signals.allowlisted ? " · allowlist" : ""}
-                  </td>
-                  <td className="px-3 py-2.5">
-                    <DecisionBadge decision={item.draft.decision} />
-                  </td>
-                  <td className="px-3 py-2.5 font-mono text-[12px] text-muted">
-                    {pct(item.draft.confidence)}
-                  </td>
-                  <td className="px-3 py-2.5 text-[12px] text-faint">
-                    {formatWhen(item.createdAt)}
+                        {item.campaignId ? (
+                          <span className="ml-2 inline-flex rounded-[2px] border border-line bg-panel px-1.5 py-px text-[10px] font-bold uppercase tracking-wide text-muted">
+                            cluster
+                          </span>
+                        ) : null}
+                        {human ? (
+                          <span className="ml-2 text-[11px] text-muted">
+                            human: {human.decision}
+                          </span>
+                        ) : null}
+                      </Link>
+                    </td>
+                    <td className="text-[12px] text-muted">
+                      lookalike {pct(item.draft.signals.lookalikeScore)}
+                      {item.draft.signals.sharedDrain ? " · drain" : ""}
+                      {item.draft.signals.htmlKitFingerprint ? " · kit" : ""}
+                      {item.draft.signals.allowlisted ? " · allowlist" : ""}
+                    </td>
+                    <td>
+                      <DecisionBadge decision={item.draft.decision} />
+                    </td>
+                    <td className="font-mono text-[12px] text-muted">
+                      {pct(item.draft.confidence)}
+                    </td>
+                    <td className="whitespace-nowrap text-[12px] text-faint">
+                      {formatWhen(item.createdAt)}
+                    </td>
+                  </tr>
+                );
+              })}
+              {filtered.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="px-3 py-10 text-center text-muted">
+                    No detections match these filters.
                   </td>
                 </tr>
-              );
-            })}
-            {filtered.length === 0 ? (
-              <tr>
-                <td colSpan={7} className="px-3 py-10 text-center text-muted">
-                  No detections match these filters.
-                </td>
-              </tr>
-            ) : null}
-          </tbody>
-        </table>
-      </div>
+              ) : null}
+            </tbody>
+          </table>
+        </div>
+      </Container>
     </div>
   );
 }
 
-function Stat({
-  label,
-  value,
-  tone,
+function FilterChip({
+  active,
+  onClick,
+  children,
+  title,
 }: {
-  label: string;
-  value: number;
-  tone?: "approve" | "watch" | "reject";
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+  title?: string;
 }) {
-  const color =
-    tone === "approve"
-      ? "text-approve"
-      : tone === "watch"
-        ? "text-watch"
-        : tone === "reject"
-          ? "text-reject"
-          : "text-ink";
   return (
-    <div className="rounded-lg border border-line bg-elevated px-3 py-1.5">
-      <div className="text-[10px] uppercase tracking-wider text-faint">{label}</div>
-      <div className={`font-mono text-sm ${color}`}>{value}</div>
-    </div>
+    <button
+      type="button"
+      title={title}
+      onClick={onClick}
+      className={`rounded-[2px] border px-2 py-1 text-[12px] ${
+        active
+          ? "border-blue bg-reject-dim font-bold text-blue-hover"
+          : "border-line bg-panel text-ink hover:bg-hover"
+      }`}
+    >
+      {children}
+    </button>
   );
 }

@@ -26,25 +26,29 @@ export function BrowserMock({
     : `https://${domain}`;
 
   return (
-    <div className="overflow-hidden rounded-xl border border-line bg-elevated shadow-[0_20px_50px_-30px_rgba(0,0,0,0.8)]">
-      <div className="flex items-center gap-2 border-b border-line bg-[#0a101b] px-3 py-2">
-        <span className="flex gap-1.5">
-          <i className="h-2.5 w-2.5 rounded-full bg-[#3d4454]" />
-          <i className="h-2.5 w-2.5 rounded-full bg-[#3d4454]" />
-          <i className="h-2.5 w-2.5 rounded-full bg-[#3d4454]" />
+    <div
+      className={`overflow-hidden border bg-panel ${
+        official ? "border-line" : "border-approve/40"
+      }`}
+    >
+      <div className="flex items-center gap-2 border-b border-line bg-row-alt px-3 py-1.5">
+        <span className="flex gap-1">
+          <i className="h-2 w-2 rounded-full bg-line-strong" />
+          <i className="h-2 w-2 rounded-full bg-line-strong" />
+          <i className="h-2 w-2 rounded-full bg-line-strong" />
         </span>
-        <div className="flex min-w-0 flex-1 items-center gap-1.5 rounded-md border border-line bg-bg px-2 py-1 font-mono text-[11px] text-muted">
+        <div className="flex min-w-0 flex-1 items-center gap-1.5 border border-line bg-panel px-2 py-0.5 font-mono text-[11px] text-muted">
           <Lock
             className={`h-3 w-3 shrink-0 ${official ? "text-official" : "text-approve"}`}
           />
           <span className="truncate">{url}</span>
         </div>
       </div>
-      <div className="min-h-[220px] p-5" style={{ background: bg, color: brand.colors.text }}>
-        <div className="mb-5 flex items-center justify-between">
+      <div className="min-h-[200px] p-4" style={{ background: bg, color: brand.colors.text }}>
+        <div className="mb-4 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <span
-              className="flex h-9 w-9 items-center justify-center rounded-lg text-xs font-bold"
+              className="flex h-8 w-8 items-center justify-center text-xs font-bold"
               style={{ background: accent, color: "#07110c" }}
             >
               {official ? brand.logoText : brand.logoText.replace("W", "VV")}
@@ -57,11 +61,11 @@ export function BrowserMock({
             </div>
           </div>
           {official ? (
-            <span className="rounded-full bg-black/30 px-2 py-0.5 text-[10px] uppercase tracking-wider text-official">
+            <span className="bg-black/30 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-official">
               Verified official
             </span>
           ) : (
-            <span className="rounded-full bg-black/30 px-2 py-0.5 text-[10px] uppercase tracking-wider text-approve">
+            <span className="bg-black/30 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-approve">
               Unverified host
             </span>
           )}
@@ -83,7 +87,7 @@ function OfficialBody({ brand, accent }: { brand: Brand; accent: string }) {
         {["Portfolio", "Activity", "Security"].map((label) => (
           <div
             key={label}
-            className="rounded-lg border border-white/10 bg-black/20 px-3 py-3 text-[11px]"
+            className="border border-white/10 bg-black/20 px-3 py-3 text-[11px]"
           >
             <div className="opacity-60">{label}</div>
             <div className="mt-1 text-sm font-medium">Live</div>
@@ -92,7 +96,7 @@ function OfficialBody({ brand, accent }: { brand: Brand; accent: string }) {
       </div>
       <button
         type="button"
-        className="w-full rounded-lg py-2 text-xs font-semibold"
+        className="w-full py-2 text-xs font-semibold"
         style={{ background: accent, color: "#07110c" }}
       >
         Open {brand.name}
@@ -112,27 +116,27 @@ function SuspiciousBody({
   const claim = /claim|airdrop|permit/.test(excerpt);
   return (
     <div className="space-y-3">
-      <div className="rounded-lg border border-white/10 bg-black/25 p-3">
+      <div className="border border-white/10 bg-black/25 p-3">
         {seed ? (
           <label className="block text-[11px] opacity-70">
             Recovery phrase
             <textarea
               readOnly
-              className="mt-1 h-14 w-full resize-none rounded-md border border-white/10 bg-black/40 p-2 text-[11px]"
+              className="mt-1 h-14 w-full resize-none border border-white/10 bg-black/40 p-2 text-[11px]"
               value=""
               placeholder="Enter 12 or 24 words"
             />
           </label>
         ) : (
           <div className="space-y-2">
-            <div className="h-8 rounded-md border border-white/10 bg-black/40" />
-            <div className="h-8 rounded-md border border-white/10 bg-black/40" />
+            <div className="h-8 border border-white/10 bg-black/40" />
+            <div className="h-8 border border-white/10 bg-black/40" />
           </div>
         )}
       </div>
       <button
         type="button"
-        className="w-full rounded-lg py-2 text-xs font-semibold"
+        className="w-full py-2 text-xs font-semibold"
         style={{ background: accent, color: "#07110c" }}
       >
         {claim ? "Connect & claim" : seed ? "Restore wallet" : "Connect wallet"}
