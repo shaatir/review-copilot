@@ -34,6 +34,7 @@ export default async function DetectionPage({
 
   return (
     <EvidenceView
+      key={item.id}
       item={item}
       siblings={siblings}
       campaign={campaignById(item.campaignId)}

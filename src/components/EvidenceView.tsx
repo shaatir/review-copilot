@@ -10,13 +10,12 @@ import {
   PageHeader,
 } from "@/components/console";
 import { formatWhen, pct, shortWallet } from "@/lib/format";
-import { loadReviews, saveReview } from "@/lib/reviews";
+import { saveReview, useReviews } from "@/lib/reviews";
 import type {
   Campaign,
   ChainPatrolCheckResult,
   Decision,
   DraftDecision,
-  HumanReview,
   TriagedDetection,
 } from "@/lib/types";
 import { Check, LoaderCircle } from "lucide-react";
@@ -39,11 +38,12 @@ export function EvidenceView({
   chainPatrolReady,
 }: EvidenceViewProps) {
   const [draft, setDraft] = useState<DraftDecision>(item.draft);
-  const [human, setHuman] = useState<HumanReview | undefined>(
-    () => loadReviews()[item.id],
-  );
-  const [note, setNote] = useState(human?.note ?? "");
-  const [choice, setChoice] = useState<Decision>(human?.decision ?? item.draft.decision);
+  const reviews = useReviews();
+  const human = reviews[item.id];
+  const [noteOverride, setNoteOverride] = useState<string | undefined>(undefined);
+  const [choiceOverride, setChoiceOverride] = useState<Decision | undefined>(undefined);
+  const note = noteOverride ?? human?.note ?? "";
+  const choice = choiceOverride ?? human?.decision ?? item.draft.decision;
   const [refining, setRefining] = useState(false);
   const [checking, setChecking] = useState(false);
   const [cp, setCp] = useState<ChainPatrolCheckResult | null>(null);
@@ -74,7 +74,7 @@ export function EvidenceView({
       const data = (await response.json()) as { draft?: DraftDecision };
       if (data.draft) {
         setDraft(data.draft);
-        if (!human) setChoice(data.draft.decision);
+        if (!human) setChoiceOverride(data.draft.decision);
       }
     } finally {
       setRefining(false);
@@ -96,13 +96,12 @@ export function EvidenceView({
   }
 
   function record() {
-    const next = saveReview({
+    saveReview({
       detectionId: item.id,
       decision: choice,
       note,
       recordedAt: new Date().toISOString(),
     });
-    setHuman(next[item.id]);
   }
 
   return (
@@ -338,7 +337,7 @@ export function EvidenceView({
                 <button
                   key={value}
                   type="button"
-                  onClick={() => setChoice(value)}
+                  onClick={() => setChoiceOverride(value)}
                   className={`rounded-[2px] border px-2 py-2 text-[11px] font-bold ${
                     choice === value
                       ? "border-blue bg-reject-dim text-blue-hover"
@@ -353,7 +352,7 @@ export function EvidenceView({
               id="analyst-note"
               name="analyst-note"
               value={note}
-              onChange={(event) => setNote(event.target.value)}
+              onChange={(event) => setNoteOverride(event.target.value)}
               placeholder="Optional analyst note"
               className="console-control mt-3 h-20 w-full resize-none px-3 py-2"
             />

@@ -3,8 +3,8 @@
 import { DecisionBadge } from "@/components/DecisionBadge";
 import { Container, PageHeader, StatTile } from "@/components/console";
 import { formatWhen, pct } from "@/lib/format";
-import { loadReviews } from "@/lib/reviews";
-import type { Campaign, Decision, HumanReview, TriagedDetection } from "@/lib/types";
+import { useReviews } from "@/lib/reviews";
+import type { Campaign, Decision, TriagedDetection } from "@/lib/types";
 import { Search } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
@@ -29,7 +29,7 @@ export function QueueView({ items, campaigns, initialCampaign }: QueueViewProps)
   const [campaign, setCampaign] = useState(() =>
     campaigns.some((item) => item.id === initialCampaign) ? initialCampaign! : "ALL",
   );
-  const [reviews] = useState<Record<string, HumanReview>>(() => loadReviews());
+  const reviews = useReviews();
 
   const brands = useMemo(
     () => [...new Set(items.map((item) => item.brand.name))],
