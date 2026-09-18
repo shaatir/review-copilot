@@ -55,6 +55,18 @@ flowchart LR
 | Agent | Deterministic heuristic in TypeScript; optional OpenAI / Anthropic rationale refine |
 | Enrichment | Optional `POST https://app.chainpatrol.io/api/v2/asset/check` |
 | Persistence | None. Human calls live in `sessionStorage` for the demo |
+| UI | AWS Console–inspired analyst shell (Tailwind). Dark header, left nav, dense tables |
+
+### Analyst console
+
+The frontend is styled as a security/ops console rather than a consumer SaaS dashboard:
+
+- Dark navy global header (`#232f3e`) with product mark, breadcrumb, and dry-run / scorer utilities
+- Left resource navigation: Queue, Campaigns, Eval, About
+- Dense filterable tables for detections, clusters, and eval mismatches
+- Evidence detail as a split console page (key-value summary, comparison, IOC/signal sections, sticky draft + human-call panels)
+
+Primary actions use Amazon-orange (`#ec7211`); links and selection use console blue (`#0073bb`). Layout is optimized for a desktop demo and remains usable on a narrow viewport via a collapsible nav.
 
 ### Decision vocabulary
 
@@ -119,10 +131,10 @@ The integration is **read-only**. Review Copilot never calls report/submit endpo
 
 ## Demo script (about 3 minutes)
 
-1. **Open the queue.** Forty-two synthetic detections across Acme Wallet, Nova Exchange, and Helix Protocol. The header should say **Dry-run only**.
-2. **Click the Acme drain · Sept cluster card.** Five lookalike hosts, one HTML kit (`wallet-connect-drainer-v3`), one shared drain. This is the campaign force-multiplier story: one payout address, many skins.
-3. **Open `DET-2401` (`acme-wallet-connect.xyz`).** Side-by-side suspicious vs official. IOCs, lookalike / WHOIS stub / kit / visual / shared drain, draft **Approve block** with a checklist and rationale. Record a human call — it stays in session storage.
-4. **Open `DET-2413` (`docs.acmewallet.io`).** Allowlisted official docs. Draft **Reject detection**. Same agent, opposite call — this is the false-positive discipline.
+1. **Open the queue.** Forty-two synthetic detections across Acme Wallet, Nova Exchange, and Helix Protocol. The dark header should say **Dry-run only**; the left nav lists Queue, Campaigns, Eval, and About.
+2. **Filter the Acme drain · Sept cluster** (toolbar chips, or Campaigns → cluster name). Five lookalike hosts, one HTML kit (`wallet-connect-drainer-v3`), one shared drain. This is the campaign force-multiplier story: one payout address, many skins.
+3. **Open `DET-2401` (`acme-wallet-connect.xyz`).** Console detail page: key-value summary, side-by-side suspicious vs official, IOCs, lookalike / WHOIS stub / kit / visual / shared drain, draft **APPROVE** with a checklist and rationale. Record a human call — it stays in session storage.
+4. **Open `DET-2413` (`docs.acmewallet.io`).** Allowlisted official docs. Draft **REJECT**. Same agent, opposite call — this is the false-positive discipline.
 5. **Open the Nova cluster, then `DET-2420` (`nova.exchange-secure.com`).** Host-trick: the registrable domain is `exchange-secure.com`, not `nova.exchange`. Same login-clone kit.
 6. **Open Eval.** Precision / recall of drafts vs golden labels. Mismatches, if any, are the point of the panel — the scorer is measured, not trusted blindly.
 
@@ -149,8 +161,8 @@ All hosts, wallets, and HTML snippets are **synthetic**. Wallets such as `0x1111
 ## Project map
 
 ```
-src/app/                Queue, evidence, eval, API routes
-src/components/         Analyst console
+src/app/                Queue, campaigns, evidence, eval, about, API routes
+src/components/         Analyst console (AWS Console–style shell)
 src/data/               Brands, allowlist, 42 detections, campaigns
 src/lib/agent/          Signals, heuristic, optional LLM
 src/lib/chainpatrol.ts  Optional asset.check client

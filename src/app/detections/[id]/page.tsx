@@ -4,7 +4,17 @@ import { campaignById } from "@/lib/campaigns";
 import { campaignSiblings } from "@/lib/agent/signals";
 import { brandById } from "@/data/brands";
 import { runtimeFlags } from "@/lib/config";
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  return { title: id };
+}
 
 export default async function DetectionPage({
   params,
@@ -24,6 +34,7 @@ export default async function DetectionPage({
 
   return (
     <EvidenceView
+      key={item.id}
       item={item}
       siblings={siblings}
       campaign={campaignById(item.campaignId)}
