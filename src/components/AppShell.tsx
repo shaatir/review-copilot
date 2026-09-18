@@ -114,7 +114,7 @@ export function AppShell({
         ) : null}
 
         <aside
-          className={`z-30 w-60 shrink-0 overflow-y-auto border-r border-line bg-panel max-lg:fixed max-lg:top-10 max-lg:bottom-0 max-lg:left-0 max-lg:transition-transform ${
+          className={`z-30 w-60 shrink-0 overflow-y-auto border-r border-line bg-panel sticky top-10 h-[calc(100vh-2.5rem)] max-lg:fixed max-lg:top-10 max-lg:bottom-0 max-lg:left-0 max-lg:h-auto max-lg:transition-transform ${
             navOpen ? "max-lg:translate-x-0" : "max-lg:-translate-x-full"
           }`}
         >
